@@ -2,6 +2,7 @@ package com.example.datnsd26.Api;
 
 import com.example.datnsd26.Entity.DiaChi;
 import com.example.datnsd26.Respository.DiaChiRespository;
+import com.example.datnsd26.Service.DiaChiService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,29 +11,31 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-public class DiaChiController {
+public class DiaChiApi {
     @Autowired
-    DiaChiRespository diaChiRespository;
+    DiaChiService diaChiService;
 
     @GetMapping("/hien-thi/dia-chi")
     public ResponseEntity<?> hienThiDiaChi() {
-        return ResponseEntity.ok(diaChiRespository.findAll());
+        return ResponseEntity.ok(diaChiService.getAll());
     }
 
     @PostMapping("/them/dia-chi")
-    public ResponseEntity<?> themDiaChi(@RequestBody @Valid DiaChi diaChi) {
-        return ResponseEntity.ok(diaChiRespository.save(diaChi));
-    }
-
-    @PostMapping("/sua/dia-chi")
-    public ResponseEntity<?> suaDiaChi(@RequestBody @Valid DiaChi diaChi) {
-        return ResponseEntity.ok(diaChiRespository.save(diaChi));
+    public ResponseEntity<?> themDiaChi(@RequestBody DiaChi diaChi) {
+        return ResponseEntity.ok(diaChiService.Add(diaChi));
     }
 
     @GetMapping("/xoa/dia-chi")
-    public String xoaDiaChi(@RequestParam("id") UUID id) {
-        diaChiRespository.deleteById(id);
-        return "Xóa thành công";
+    public ResponseEntity<?> xoaDiaChi(@RequestParam("id") UUID id) {
+        return ResponseEntity.ok(diaChiService.deleteById(id));
     }
-
+    @PutMapping("/sua/dia-chi/{id}")
+    public ResponseEntity<DiaChi> updateDiaChi(@PathVariable UUID id, @RequestBody DiaChi diaChi) {
+        try {
+            DiaChi updatedDiaChi = diaChiService.updateDiaChi(id, diaChi);
+            return ResponseEntity.ok(updatedDiaChi);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
