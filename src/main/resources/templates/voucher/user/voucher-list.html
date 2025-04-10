@@ -8,31 +8,48 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css"/>
     <script>
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
         function updateVoucherStatuses() {
+            const page = getQueryParam('page') || 0;
+            const size = getQueryParam('size') || 5;
+
             $.ajax({
-                url: "/admin/vouchers/statuses",
+                url: `/admin/vouchers/statuses?page=${page}&size=${size}`,
                 type: "GET",
                 dataType: "json",
                 success: function (data) {
                     data.forEach(function (voucher) {
                         let row = $("#voucher-" + voucher.id);
+                        if (row.length === 0) {
+                            console.warn("Không tìm thấy dòng cho ID:", voucher.id);
+                            return;
+                        }
+
                         let statusCell = row.find(".status span");
+                        if (statusCell.length === 0) {
+                            console.warn("Không tìm thấy ô trạng thái cho ID:", voucher.id);
+                            return;
+                        }
+
                         statusCell.removeClass("bg-success bg-warning bg-danger");
 
                         if (voucher.trangThai === 1) {
-                            statusCell.addClass("bg-success").text("Hoạt động");
+                            statusCell.addClass("bg-success").text("Đang diễn ra");
                         } else if (voucher.trangThai === 0) {
-                            statusCell.addClass("bg-warning").text("Chưa bắt đầu");
+                            statusCell.addClass("bg-warning").text("Chưa diễn ra");
                         } else if (voucher.trangThai === 2) {
-                            statusCell.addClass("bg-danger").text("Hết hạn");
+                            statusCell.addClass("bg-danger").text("Đã kết thúc");
                         }
                     });
                 },
-                error: function (xhr, status, error) {
-                    console.error("Lỗi khi lấy trạng thái voucher:", xhr.responseText);
+                error: function (xhr) {
+                    console.error("Lỗi khi lấy trạng thái khuyến mãi:", xhr.responseText);
                 }
             });
-
         }
 
         // Gọi API cập nhật trạng thái mỗi 10 giây
@@ -52,9 +69,9 @@
 
             <select name="trangThai">
                 <option value="">-- Chọn trạng thái --</option>
-                <option value="0">Chưa Bắt Đầu</option>
-                <option value="1">Đang Hoạt Động</option>
-                <option value="2">Hết Hạn</option>
+                <option value="0">Chưa diễn ra</option>
+                <option value="1">Đang diễn ra</option>
+                <option value="2">Đã kết thúc</option>
             </select>
             <input type="datetime-local" name="ngayBatDau">
             <input type="datetime-local" name="ngayKetThuc">
@@ -95,15 +112,18 @@
                             <span th:if="${voucher.hinhThucGiam == 'Theo Giá Tiền'}"
                                   th:text="${#numbers.formatDecimal(voucher.giaTriGiam, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"></span>
                         </td>
-                        <td th:text="${#numbers.formatDecimal(voucher.giaTriGiamToiDa, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"></td>
+                        <td th:if="${voucher.hinhThucGiam == 'Phần Trăm'}"
+                            th:text="${#numbers.formatDecimal(voucher.giaTriGiamToiDa, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}">
+                        </td>
+                        <td th:if="${voucher.hinhThucGiam == 'Theo Giá Tiền'}"></td> <!-- Không hiển thị gì nếu Theo Giá Tiền -->
                         <td th:text="${voucher.hinhThucGiam}"></td>
                         <td th:text="${voucher.soLuong}"></td>
                         <td th:text="${#temporals.format(voucher.ngayBatDau, 'dd/MM/yyyy HH:mm')}"></td>
                         <td th:text="${#temporals.format(voucher.ngayKetThuc, 'dd/MM/yyyy HH:mm')}"></td>
                         <td class="status">
-                            <span th:if="${voucher.trangThai == 1}" class="badge bg-success">Hoạt động</span>
-                            <span th:if="${voucher.trangThai == 0}" class="badge bg-warning">Chưa bắt đầu</span>
-                            <span th:if="${voucher.trangThai == 2}" class="badge bg-danger">Hết hạn</span>
+                            <span th:if="${voucher.trangThai == 1}" class="badge bg-success">Đang diễn ra</span>
+                            <span th:if="${voucher.trangThai == 0}" class="badge bg-warning">Chưa diễn ra</span>
+                            <span th:if="${voucher.trangThai == 2}" class="badge bg-danger">Đã kết thúc</span>
                         </td>
                         <td>
                             <a class="btn btn-warning btn-sm"

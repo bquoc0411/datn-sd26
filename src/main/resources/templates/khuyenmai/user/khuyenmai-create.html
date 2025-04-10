@@ -6,6 +6,7 @@
     <title>Tạo Khuyến Mãi</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
         .error-message {
             color: red;
@@ -60,7 +61,7 @@
             <div class="card-body">
                 <form th:action="@{/admin/khuyen-mai/create}" method="post" novalidate id="khuyenMaiForm"
                       onsubmit="return validate(event);">
-                    <div class="row">
+                    <div>
                         <div class="col-md-5">
 
                             <div class="mb-3">
@@ -117,7 +118,7 @@
                                 </div>
 
                         </div>
-                        <div class="col-md-7">
+                        <div >
                             <!-- Bảng sản phẩm -->
                             <div class="card mb-3">
                                         <input type="text" id="searchSanPham" class="form-control"
@@ -132,26 +133,45 @@
                                                 <th style="width: 50px">
                                                     <input type="checkbox" id="selectAll" class="form-check-input">
                                                 </th>
+                                                <th>Ảnh sản phẩm</th>
                                                 <th>Sản phẩm</th>
+                                                <th>Size</th>
+                                                <th style="width: 120px">Màu</th>
                                                 <th>Giá gốc</th>
                                                 <th>Mức giảm</th>
                                                 <th>Giá sau giảm</th>
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            <tr th:each="sp, iterStat : ${sanPhamPage.content}">
+                                            <tr th:each="spct, iterStat : ${sanPhamPage.content}">
                                                 <td class="text-center">
                                                     <input type="checkbox" class="form-check-input chonSanPham"
-                                                           th:name="'sanPham_' + ${sp.id}"
-                                                           th:data-product-id="${sp.id}">
+                                                           th:name="'sanPham_' + ${spct.id}"
+                                                           th:data-product-id="${spct.id}">
                                                 </td>
-                                                <td th:text="${sp.sanPham.tenSanPham}"></td>
-                                                <td th:text="${#numbers.formatDecimal(sp.giaBan, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"
-                                                    class="giaGoc" th:data-gia="${sp.giaBan}"></td>
+                                                <td>
+                                                    <div class="carousel-inner">
+                                                        <th:block th:each="anhs, index : ${spct.hinhAnh}">
+                                                            <div th:classappend="${index.index == 0} ? 'carousel-item active' : 'carousel-item'">
+                                                                <!-- Hình ảnh carousel -->
+                                                                <img th:if="${anhs.tenAnh != null}"
+                                                                     th:src="@{'/upload' + ${anhs.tenAnh.substring(anhs.tenAnh.lastIndexOf('upload') + 6)}}"
+                                                                     class="d-block w-100 carousel-img rounded-3" alt="Ảnh">
+                                                            </div>
+                                                        </th:block>
+                                                    </div>
+                                                </td>
+                                                <td th:text="${spct.sanPham.tenSanPham}"></td>
+                                                <td th:text="${spct.kichCo != null ? spct.kichCo.ten : ''}"></td>
+                                                <td>
+                                                    <input type="color" th:value="${spct.mauSac.ten}" class="form-control" disabled>
+                                                </td>
+                                                <td th:text="${#numbers.formatDecimal(spct.giaBan, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"
+                                                    class="giaGoc" th:data-gia="${spct.giaBan}"></td>
                                                 <td>
                                                     <div class="input-group">
                                                         <input type="number" class="form-control mucGiam"
-                                                               th:name="'mucGiam_' + ${sp.id}" min="0" disabled>
+                                                               th:name="'mucGiam_' + ${spct.id}" min="0" disabled>
                                                         <span class="input-group-text mucGiamUnit">VNĐ</span>
                                                     </div>
                                                 </td>
@@ -223,7 +243,7 @@
         let currentPage = 0;
 
         function fetchSanPham(keyword, page = 0) {
-            fetch(`/admin/khuyen-mai/tim-kiem-san-pham?keyword=${keyword}&page=${page}`)
+            fetch(`/admin/khuyen-mai/product-search?keyword=${keyword}&page=${page}`)
                 .then(response => response.json())
                 .then(data => {
                     let suggestions = document.getElementById("suggestions");
