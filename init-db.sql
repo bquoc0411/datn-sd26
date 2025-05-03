@@ -268,7 +268,7 @@ select * from tai_khoan
 select * from nhan_vien
 
     INSERT INTO nhan_vien (id_tai_khoan, ma_nhan_vien, ho_ten, dia_chi_cu_the, tinh_thanh_pho, quan_huyen, xa_phuong, gioi_tinh, hinh_anh, ngay_sinh, trang_thai, ngay_tao, ngay_cap_nhat)
-VALUES (1, 'NVADMIN01', N'Nguyễn Văn An', N'123 Đường ABC, Phường XYZ', N'Hà Nội', N'Ba Đình', N'Phúc Xá', 1, null, '1990-01-01', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+VALUES (1, 'NVADMIN01', N'Nguyễn Văn An', N'123 Đường ABC, Phường XYZ', N'Hà Nội', N'Ba Đình', N'Phúc Xá', 1, 'default.jpg', '1990-01-01', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 INSERT INTO nhan_vien (id_tai_khoan, ma_nhan_vien, ho_ten, dia_chi_cu_the, tinh_thanh_pho, quan_huyen, xa_phuong, gioi_tinh, hinh_anh, ngay_sinh, trang_thai, ngay_tao, ngay_cap_nhat)
-VALUES (2, 'NV00002', N'Hoàng Thị Hà Lan', N'123 Đường Nguyễn Lan', N'Hà Nội', N'Hà Đông', N'Văn Quán', 2, null, '1990-01-01', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+VALUES (2, 'NV00002', N'Hoàng Thị Hà Lan', N'123 Đường Nguyễn Lan', N'Hà Nội', N'Hà Đông', N'Văn Quán', 2, 'default.jpg', '1990-01-01', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
